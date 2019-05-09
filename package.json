@@ -1,0 +1,22 @@
+{
+  "name": "br",
+  "version": "1.0.0",
+  "description": "Birthday Reminders",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/increscent/br.git"
+  },
+  "author": "Robert Williams",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/increscent/br/issues"
+  },
+  "homepage": "https://github.com/increscent/br#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
