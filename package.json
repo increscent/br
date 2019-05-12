@@ -17,6 +17,10 @@
   },
   "homepage": "https://github.com/increscent/br#readme",
   "dependencies": {
-    "express": "^4.16.4"
+    "body-parser": "^1.19.0",
+    "express": "^4.16.4",
+    "mongodb": "^3.2.4",
+    "mustache-express": "^1.2.8",
+    "nodemailer": "^6.1.1"
   }
 }
