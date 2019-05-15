@@ -3,50 +3,83 @@ const mustache = require('mustache');
 const db = require('./src/db.js');
 const constants = require('./src/constants.js');
 const config = require('./config.json');
+const fs = require('fs');
+const emailSubjectTemplate = fs.readFileSync('./src/views/reminder_subject.mustache').toString();
+const emailBodyTemplate = fs.readFileSync('./src/views/reminder_body.mustache').toString();
 
-var today = new Date();
-var day = today.getDate();
-var month = today.getMonth()+1;
-var year = today.getFullYear();
 
-var queries = [];
-
-// TODO: just add one to the date and then recalculate day, month, year stuff
-
-query = {
-    month,
-    day: {$lte: day+3, $gte: day},
-    yearSent: {$lt: year},
-};
-
-db.ready(() => {
-    db.reminders.find(query).toArray((err, data) => {
-        console.log(data);
-        db.client.close();
-    });
+var transporter = nodemailer.createTransport({
+    host: 'smtp.fastmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: config.smtp.username,
+        pass: config.smtp.password,
+    },
 });
 
+
 async function main() {
-    var transporter = nodemailer.createTransport({
-        host: 'smtp.fastmail.com',
-        port: 465,
-        secure: true,
-        auth: {
-            user: config.smtp.username,
-            pass: config.smtp.password,
-        },
-    });
+    for (var i = 0; i <= 3; i++) {
+        var date = new Date();
+        date.setDate(date.getDate()+i);
+        var day = date.getDate();
+        var month = date.getMonth()+1;
+        var year = date.getFullYear();
+        var dayOfWeek = constants.days[date.getDay()];
 
-    let info = await transporter.sendMail({
-        from: `"Birthday Reminders" <${config.smtp.username}>`,
-        to: 'robert@increscent.org',
-        subject: 'Devan has a birthday December 22',
-        html: '<p>Here\'s a friendly reminder that Devan has a birthday on Wednesday, December 22</p>',
-    });
+        query = {
+            month,
+            day,
+            yearSent: {$lt: year},
+        };
 
-    console.log(info);
+        var result = new Promise((resolve, reject) => {
+            db.reminders.find(query)
+                .toArray((err, data) => resolve([err, data]));
+        });
 
-    process.exit();
+        var [err, reminders] = await result;
+
+        if (err)
+            continue;
+
+        for (var j = 0; j < reminders.length; j++) {
+            var reminder = reminders[j];
+
+            var data = {
+                ...reminder,
+                month: constants.months[month-1],
+                dayOfWeek,
+                baseUrl: config.baseUrl,
+            };
+
+            let info = await transporter.sendMail({
+                from: `"${config.smtp.name}" <${config.smtp.username}>`,
+                to: reminder.email,
+                subject: mustache.render(emailSubjectTemplate, data),
+                html: mustache.render(emailBodyTemplate, data),
+            });
+
+            if (info.accepted.length == 1) {
+                console.log(`Sent reminder (${reminder.token}) to ${reminder.email}.`);
+
+                await new Promise((resolve, reject) => {
+                    db.reminders.updateOne({_id: reminder._id}, {$set: {yearSent: year}},
+                        (err, data) => resolve(err, data));
+                });
+            } else {
+                console.log(`Failed to send reminder (${reminder.token}) to ${reminder.email}.`);
+            }
+        }
+    }
 }
 
-//main();
+db.ready(async () => {
+    await main()
+        .catch((err) => {
+            console.log(err);
+            process.exit(1);
+        });
+    process.exit();
+});

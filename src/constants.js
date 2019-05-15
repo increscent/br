@@ -14,4 +14,13 @@ module.exports = {
         'November',
         'December',
     ],
+    days: [
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+    ],
 };
