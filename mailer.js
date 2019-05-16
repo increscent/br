@@ -75,11 +75,15 @@ async function main() {
     }
 }
 
-db.ready(async () => {
-    await main()
-        .catch((err) => {
-            console.log(err);
-            process.exit(1);
-        });
-    process.exit();
-});
+module.exports = () => {
+    db.ready(async () => {
+        await main()
+            .catch((err) => {
+                console.log(err);
+            });
+
+        console.log('Mailer has finished.');
+    });
+};
+
+module.exports();

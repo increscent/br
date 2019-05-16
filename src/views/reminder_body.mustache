@@ -1,8 +1,8 @@
 Here's a friendly reminder that {{ name }} has a birthday on {{ dayOfWeek }}, {{ month }} {{ day }}.
 
 <br/><br/>
-<a href="{{ baseUrl }}/delete/reminder/{{ token }}">Unsubscribe from this reminder</a>
+<a href="{{ baseUrl }}/delete/reminder?token={{ token }}">Unsubscribe from this reminder</a>
 <br/>
-<a href="{{ baseUrl }}/delete/reminder/{{ token }}/all">Unsubscribe from all reminders</a>
+<a href="{{ baseUrl }}/delete/reminder/all?email={{ email }}">Unsubscribe from all reminders</a>
 <br/><br>
 Powered by <a href="{{ baseUrl }}">Increscent Birthday Reminders</a>

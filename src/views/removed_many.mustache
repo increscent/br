@@ -1,0 +1,15 @@
+<h2>Reminders Removed</h2>
+
+<p>The following reminders were removed:</p>
+
+<table>
+    {{ #reminders }}
+    <tr>
+        <td>{{ name }},</td>
+        <td>{{ month }} {{ day }}</td>
+    </tr>
+    {{/ reminders }}
+</table>
+
+<br/>
+<p>If you would like to revert this action, click: <a href="/undo/{{ actionToken }}">undo</a></p>

@@ -4,8 +4,14 @@ const url = 'mongodb://localhost:27017';
 const dbName = 'br';
 
 var readyCallbacks = [];
+var isReady = false;
 module.exports = {
-    ready: (cb) => readyCallbacks.push(cb),
+    ready: (cb) => {
+        if (isReady)
+            cb();
+        else
+            readyCallbacks.push(cb);
+    },
 };
 
 mongoClient.connect(url, {useNewUrlParser: true}, function(err, client) {
@@ -15,7 +21,9 @@ mongoClient.connect(url, {useNewUrlParser: true}, function(err, client) {
 
     module.exports.client = client;
     module.exports.reminders = db.collection('reminders');
+    module.exports.actions = db.collection('actions');
 
     for (var i = 0; i < readyCallbacks.length; i++)
         readyCallbacks[i]();
+    isReady = true;
 });
