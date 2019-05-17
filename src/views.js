@@ -3,6 +3,13 @@ const constants = require('./constants.js');
 module.exports = {
     add: (req, res) => render(res, 'add'),
     added: remindersView('added'),
+    get: (req, res) => render(res, 'get'),
+    gotten: (req, res) => {
+        if (res.success)
+            render(res, 'gotten');
+        else
+            res.error('We failed to send you an email.');
+    },
     removed: remindersView('removed'),
     error: (req, res) => render(res, 'error', {error: res.errorText}),
 };

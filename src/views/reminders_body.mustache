@@ -1,0 +1,26 @@
+Here is a list of your Birthday Reminders:
+
+<style>
+    td {
+        padding: 10px 20px;
+    }
+</style>
+
+<br/><br/>
+<table>
+    {{ #reminders }}
+    <tr>
+        <td>{{ name }}</td>
+        <td>{{ month }}</td>
+        <td>{{ day }}</td>
+        <td><a href="{{ baseUrl }}/delete/reminder?token={{ token }}">Delete this reminder</a></td>
+    </tr>
+    {{ /reminders }}
+</table>
+
+<br/><br/>
+<a href="{{ baseUrl }}/view/add">Add another reminder</a>
+<br/>
+<a href="{{ baseUrl }}/delete/reminder/all?email={{ email }}">Unsubscribe from all reminders</a>
+<br/><br>
+Powered by <a href="{{ baseUrl }}">Increscent Birthday Reminders</a>

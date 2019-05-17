@@ -1,23 +1,5 @@
-const nodemailer = require('nodemailer');
-const mustache = require('mustache');
+const sender = require('./src/sender.js');
 const db = require('./src/db.js');
-const constants = require('./src/constants.js');
-const config = require('./config.json');
-const fs = require('fs');
-const emailSubjectTemplate = fs.readFileSync('./src/views/reminder_subject.mustache').toString();
-const emailBodyTemplate = fs.readFileSync('./src/views/reminder_body.mustache').toString();
-
-
-var transporter = nodemailer.createTransport({
-    host: 'smtp.fastmail.com',
-    port: 465,
-    secure: true,
-    auth: {
-        user: config.smtp.username,
-        pass: config.smtp.password,
-    },
-});
-
 
 async function main() {
     for (var i = 0; i <= 3; i++) {
@@ -26,13 +8,21 @@ async function main() {
         var day = date.getDate();
         var month = date.getMonth()+1;
         var year = date.getFullYear();
-        var dayOfWeek = constants.days[date.getDay()];
 
         query = {
             month,
             day,
             yearSent: {$lt: year},
         };
+
+        // always include February 29
+        if (month == 2 && day == 28) {
+            query = {
+                month,
+                $or: [{day: 28}, {day: 29}],
+                yearSent: {$lt: year},
+            };
+        }
 
         var result = new Promise((resolve, reject) => {
             db.reminders.find(query)
@@ -47,21 +37,9 @@ async function main() {
         for (var j = 0; j < reminders.length; j++) {
             var reminder = reminders[j];
 
-            var data = {
-                ...reminder,
-                month: constants.months[month-1],
-                dayOfWeek,
-                baseUrl: config.baseUrl,
-            };
+            var success = await sender.sendReminder(reminder, date);
 
-            let info = await transporter.sendMail({
-                from: `"${config.smtp.name}" <${config.smtp.username}>`,
-                to: reminder.email,
-                subject: mustache.render(emailSubjectTemplate, data),
-                html: mustache.render(emailBodyTemplate, data),
-            });
-
-            if (info.accepted.length == 1) {
+            if (success) {
                 console.log(`Sent reminder (${reminder.token}) to ${reminder.email}.`);
 
                 await new Promise((resolve, reject) => {

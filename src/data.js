@@ -24,6 +24,19 @@ module.exports = {
         var tokens = req.query.token ? [req.query.token] : null;
         removeReminders([tokens, req.query.email], req, res, next);
     },
+    getReminders: (req, res, next) => {
+        var email = req.body.email;
+
+        db.reminders.find({email}).toArray((err, data) => {
+            if (err || !data.length)
+                return res.error('We couldn\'t find any Birthday Reminders for that email.');
+
+            res.reminders = data;
+            res.email = email;
+
+            next();
+        });
+    },
     undo: (req, res, next) => {
         var actionToken = req.params.actionToken;
 
