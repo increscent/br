@@ -31,6 +31,8 @@ module.exports = {
             if (err || !data.length)
                 return res.error('We couldn\'t find any Birthday Reminders for that email.');
 
+            var weight = x => x.month*50 + x.day;
+            data.sort((a, b) => weight(a) - weight(b));
             res.reminders = data;
             res.email = email;
 
