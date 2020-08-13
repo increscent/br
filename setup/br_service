@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+
+# PROVIDE: br
+
+. /etc/rc.subr
+
+name="br"
+rcvar="${name}_enable"
+pidfile="/var/run/${name}.pid"
+command="/usr/sbin/daemon"
+command_args="-c -f -P ${pidfile} -r /home/robert/br/index.js"
+
+load_rc_config $name
+run_rc_command "$1"
