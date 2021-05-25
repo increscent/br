@@ -2,8 +2,8 @@ const nodemailer = require('nodemailer');
 const config = require('../config.json');
 
 var transporter = nodemailer.createTransport({
-    host: 'smtp.fastmail.com',
-    port: 465,
+    host: config.smtp.host,
+    port: config.smtp.port,
     secure: true,
     auth: {
         user: config.smtp.username,
