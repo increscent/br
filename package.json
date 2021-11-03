@@ -24,6 +24,6 @@
     "mustache-express": "^1.2.8",
     "nodemailer": "^6.4.16",
     "uuid": "^3.3.2",
-    "validator": "^10.11.0"
+    "validator": "^13.7.0"
   }
 }
